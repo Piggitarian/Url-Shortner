@@ -1,16 +1,19 @@
 import { randomBytes, timingSafeEqual, createPublicKey, createHash } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 
+// Google account · Step 1: Generate unpredictable flow values and compare them safely.
 const random = () => randomBytes(32).toString('base64url');
 const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
 const fail = code => Object.assign(new Error('Google sign-in failed.'), { oauthCode: code });
 const jsonResponse = async response => { if (!response.ok) throw fail('google_unavailable'); return response.json(); };
 
+// Google account · Step 2: Enable provider routes only when client credentials exist.
 export function mountGoogleAuth({ app, User, config, baseUrl, cookieOptions, setSession, fetchGoogle = fetch }) {
   const enabled = Boolean(config.googleClientId && config.googleClientSecret);
   const callbackUrl = req => config.googleRedirectUri || `${baseUrl(req)}/api/auth/google/callback`;
   const stateCookie = 'littlelink_google_flow';
   let keys = [], keysExpire = 0;
+// Google account · Step 3: Verify Google signatures, audience, issuer, nonce, and email.
   async function verifyIdToken(idToken, nonce) {
     const decoded = jwt.decode(idToken, { complete: true });
     if (!decoded || decoded.header.alg !== 'RS256' || !decoded.header.kid) throw fail('google_invalid');
@@ -29,7 +32,9 @@ export function mountGoogleAuth({ app, User, config, baseUrl, cookieOptions, set
     if (!same(claims.nonce, nonce) || !claims.sub || claims.email_verified !== true || typeof claims.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(claims.email) || claims.email.length > 254) throw fail('google_invalid');
     return claims;
   }
+// Google account · Step 4: Expose provider availability to the frontend.
   app.get('/api/auth/options', (req, res) => res.json({ google: enabled }));
+// Google account · Step 5: Start an authorization flow with signed state and PKCE.
   app.get('/api/auth/google', (req, res) => {
     if (!enabled) return res.redirect('/?authError=google_not_configured');
     const state = random(), verifier = random(), nonce = random();
@@ -43,6 +48,7 @@ export function mountGoogleAuth({ app, User, config, baseUrl, cookieOptions, set
     }).toString();
     res.set('Cache-Control', 'no-store').redirect(authorizationUrl.href);
   });
+// Google account · Step 6: Validate the callback before exchanging its authorization code.
   app.get('/api/auth/google/callback', async (req, res) => {
     const token = req.cookies[stateCookie];
     res.clearCookie(stateCookie, cookieOptions);
@@ -59,6 +65,7 @@ export function mountGoogleAuth({ app, User, config, baseUrl, cookieOptions, set
         body: new URLSearchParams({ code: req.query.code, client_id: config.googleClientId, client_secret: config.googleClientSecret, redirect_uri: callbackUrl(req), grant_type: 'authorization_code', code_verifier: flow.verifier }),
       });
       const tokens = await jsonResponse(response);
+// Google account · Step 7: Use verified claims to find, link, or create an account.
       const claims = await verifyIdToken(tokens.id_token, flow.nonce);
       const email = claims.email.toLowerCase();
       let user = await User.findOne({ googleId: claims.sub });
@@ -83,6 +90,7 @@ export function mountGoogleAuth({ app, User, config, baseUrl, cookieOptions, set
         }
       }
       if (!user) throw fail('google_unavailable');
+// Google account · Step 8: Start the session and return the user to the dashboard.
       setSession(res, user);
       res.redirect('/dashboard');
     } catch (err) {

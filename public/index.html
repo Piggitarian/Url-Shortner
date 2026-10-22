@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+<!-- Shared layout · Step 1: Load the font, styles, page metadata, and deferred behavior. -->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,9 +12,11 @@
   <script src="/app.js" defer></script>
 </head>
 <body data-theme="meadow">
+  <!-- Shared layout · Step 2: Layer two landscapes for smooth theme changes. -->
   <div class="landscape is-visible" data-scene="meadow" aria-hidden="true"></div>
   <div class="landscape" data-scene="meadow" aria-hidden="true"></div>
   <div class="scene-shade" aria-hidden="true"></div>
+  <!-- Shared layout · Step 3: Keep home and account access at the top of every page. -->
   <header class="site-header">
     <a class="wordmark" href="/" aria-label="Littlelink home" title="Home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="m13 19 6-6M12 22l-1 1a6 6 0 0 1-8-8l5-5a6 6 0 0 1 8 0m0 12a6 6 0 0 0 8 0l5-5a6 6 0 0 0-8-8l-1 1"/></svg></a>
     <nav aria-label="Main navigation" id="navigation">
@@ -21,6 +24,7 @@
     </nav>
   </header>
 
+  <!-- Home page · Step 1: Present one URL field with a clear shorten action. -->
   <main id="home" class="home">
     <div class="hero">
       <h1>What would you like to <span class="heading-word">shorten?</span></h1>
@@ -30,6 +34,7 @@
         <input id="long-url" name="longUrl" type="text" inputmode="url" placeholder="Paste a link" maxlength="4096" autocomplete="url" required>
         <button class="button button-dark shorten-submit" type="submit" aria-label="Shorten link" title="Shorten link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
       </form>
+      <!-- Home page · Step 2: Show validation errors and the resulting short link. -->
       <p id="shorten-error" class="form-error" role="alert" hidden></p>
       <div id="shorten-result" class="shorten-result" aria-live="polite" hidden>
         <div><span class="result-caption">A LITTLE LINK, READY TO GO</span><a id="result-url" href="#" target="_blank" rel="noopener noreferrer"></a></div>
@@ -39,9 +44,11 @@
     </div>
   </main>
 
+  <!-- Dashboard page · Step 1: Introduce the saved collection and public profile link. -->
   <main id="dashboard" class="dashboard" hidden>
     <div class="dashboard-heading"><div><p class="eyebrow">YOUR CORNER OF THE INTERNET</p><h1>Your little <em>space.</em></h1><p>All your good things, together.</p></div><a id="view-profile" class="button button-light" target="_blank" rel="noopener noreferrer">View your page ↗</a></div>
     <div class="dashboard-grid">
+      <!-- Dashboard page · Step 2: Add links and render the editable saved collection. -->
       <section class="panel links-panel" aria-labelledby="links-heading">
         <div class="panel-heading"><h2 id="links-heading">Your links <span id="link-count" class="count">0</span></h2><span class="small-label" id="click-count">0 total clicks</span></div>
         <form id="add-link-form" class="add-link-form"><label for="add-url">Add a little link</label><div class="inline-input"><input id="add-url" name="longUrl" placeholder="Paste a website address…" inputmode="url" maxlength="4096" required><button class="button button-dark" type="submit">Add ↗</button></div></form>
@@ -49,6 +56,7 @@
         <div id="saved-links" class="saved-links"></div>
         <div id="empty-links" class="empty-links"><span aria-hidden="true">↗</span><h3>A little blank canvas.</h3><p>Add your first link above.<br>Your favorites will feel right at home.</p></div>
       </section>
+      <!-- Dashboard page · Step 3: Edit the name, bio, landscape, and profile sharing controls. -->
       <aside class="panel profile-panel">
         <div class="panel-heading"><h2>Make it yours</h2><span aria-hidden="true">✳</span></div>
         <form id="profile-form" class="profile-form">
@@ -65,16 +73,49 @@
     </div>
   </main>
 
+  <!-- Public profile page · Step 1: Display the name, bio, and links marked as public. -->
   <main id="public-profile" class="public-profile" hidden>
     <div class="public-profile-content"><div id="public-avatar" class="avatar avatar-large" aria-hidden="true"></div><p id="public-handle" class="eyebrow"></p><h1 id="public-name"></h1><p id="public-bio" class="public-bio"></p><div id="public-links" class="public-links"></div><p id="public-empty" hidden>A little space with good things on the way.</p><a class="profile-brand" href="/">Made a little lighter with littlelink ↗</a></div>
   </main>
 
+  <!-- Shared layout · Step 4: Offer landscape choices and an animation pause control. -->
   <footer class="site-footer" id="site-footer"><div class="theme-picker" role="group" aria-label="Choose background theme"><button data-theme-choice="meadow" aria-pressed="true" aria-label="Meadow" title="Meadow"><span class="theme-dot meadow-dot"></span></button><button data-theme-choice="dusk" aria-pressed="false" aria-label="Dusk" title="Dusk"><span class="theme-dot dusk-dot"></span></button><button data-theme-choice="ocean" aria-pressed="false" aria-label="Ocean" title="Ocean"><span class="theme-dot ocean-dot"></span></button><button data-theme-choice="forest" aria-pressed="false" aria-label="Forest" title="Forest"><span class="theme-dot forest-dot"></span></button><button data-theme-choice="ember" aria-pressed="false" aria-label="Ember" title="Ember"><span class="theme-dot ember-dot"></span></button></div><button id="motion-toggle" class="motion-toggle" aria-pressed="false" aria-label="Pause background animation" title="Pause background animation"><span aria-hidden="true">Ⅱ</span></button></footer>
 
-  <dialog id="auth-dialog" class="auth-dialog"><button class="dialog-close" data-close="auth-dialog" aria-label="Close">×</button><div class="dialog-mark" aria-hidden="true">↗</div><p class="eyebrow">A LITTLE PLACE FOR YOUR LINKS</p><h2 id="auth-heading">Welcome <em>back.</em></h2><p id="auth-description">Your little corner is waiting for you.</p><form id="auth-form" class="auth-form"><div id="register-fields" hidden><label for="auth-username">Your username</label><div class="username-field"><span>@</span><input id="auth-username" name="username" pattern="[a-z0-9_]{3,24}" minlength="3" maxlength="24" autocomplete="username" placeholder="your_little_name"></div><span class="field-hint">3–24 letters, numbers, or underscores.</span></div><label for="auth-email">Email address</label><input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com"><label for="auth-password">Password</label><input id="auth-password" name="password" type="password" autocomplete="current-password" minlength="10" maxlength="72" required placeholder="At least 10 characters"><p id="auth-error" class="form-error" role="alert" hidden></p><button id="auth-submit" class="button button-dark" type="submit">Log in ↗</button></form><p class="auth-switch"><span id="auth-switch-label">New around here?</span> <button id="auth-switch" class="text-button">Create your little space</button></p></dialog>
+  <!-- Account page · Step 1: Open an accessible dialog over the current page. -->
+  <dialog id="auth-dialog" class="auth-dialog account-dialog" aria-labelledby="auth-heading" aria-describedby="auth-description">
+    <button class="dialog-close" type="button" data-close="auth-dialog" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    <!-- Account page · Step 2: Preview the personal link page against the selected landscape. -->
+    <aside class="auth-scene" aria-label="Your personal link space">
+      <div class="auth-scene-brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="m13 19 6-6M12 22l-1 1a6 6 0 0 1-8-8l5-5a6 6 0 0 1 8 0m0 12a6 6 0 0 0 8 0l5-5a6 6 0 0 0-8-8l-1 1"/></svg><span>littlelink</span><span class="auth-scene-star" aria-hidden="true">✳</span></div>
+      <div class="auth-scene-copy"><p class="eyebrow">A SPACE THAT FEELS LIKE YOU</p><h2>Good links.<br>A little <em>home.</em></h2><p>Your favorites, your projects, your corner of the internet. All together.</p></div>
+      <div class="auth-preview" aria-hidden="true"><span class="auth-preview-avatar">✳</span><span class="auth-preview-handle">@your_little_space</span><div class="auth-preview-link"><span>01</span>My little website<span>↗</span></div><div class="auth-preview-link"><span>02</span>Something worth sharing<span>↗</span></div></div>
+      <p class="auth-scene-footer"><span aria-hidden="true">↗</span> A little link goes a long way.</p>
+    </aside>
+    <!-- Account page · Step 3: Choose login or signup without leaving the dialog. -->
+    <section class="auth-content">
+      <div class="auth-mode-switch" role="group" aria-label="Account access"><button type="button" data-auth="login" aria-pressed="true">Log in</button><button type="button" data-auth="register" aria-pressed="false">Sign up</button></div>
+      <p class="eyebrow auth-kicker">YOUR LINKS. YOUR LITTLE WORLD.</p>
+      <h2 id="auth-heading">Welcome <em>back.</em></h2>
+      <p id="auth-description">Your little corner is waiting for you.</p>
+      <!-- Account page · Step 4: Collect account details with labels and browser autofill. -->
+      <form id="auth-form" class="auth-form">
+        <div id="register-fields" hidden><label for="auth-username">Your username</label><div class="auth-input username-field"><span aria-hidden="true">@</span><input id="auth-username" name="username" pattern="[a-z0-9_]{3,24}" minlength="3" maxlength="24" autocomplete="username" placeholder="your_little_name" aria-describedby="username-hint" disabled></div><span id="username-hint" class="field-hint">3–24 lowercase letters, numbers, or underscores.</span></div>
+        <label for="auth-email">Email address</label><div class="auth-input"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg><input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com"></div>
+        <label for="auth-password">Password</label><div class="auth-input"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></svg><input id="auth-password" name="password" type="password" autocomplete="current-password" maxlength="72" required placeholder="Your password" aria-describedby="password-hint"><button id="toggle-password" class="password-toggle" type="button" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div>
+        <span id="password-hint" class="field-hint" hidden>At least 10 characters. Make it something only you know.</span>
+        <!-- Account page · Step 5: Show errors inline and submit the selected account action. -->
+        <p id="auth-error" class="form-error" role="alert" hidden></p>
+        <button id="auth-submit" class="button button-dark auth-submit" type="submit"><span id="auth-submit-label">Log in</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+      </form>
+      <p class="auth-switch"><span id="auth-switch-label">New around here?</span> <button id="auth-switch" class="text-button" type="button">Create your little space</button></p>
+      <p class="auth-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></svg> A private place for your next good thing.</p>
+    </section>
+  </dialog>
 
+  <!-- Dashboard page · Step 4: Edit a link title, visibility, or removal inside a dialog. -->
   <dialog id="edit-dialog" class="auth-dialog edit-dialog"><button class="dialog-close" data-close="edit-dialog" aria-label="Close">×</button><p class="eyebrow">THE LITTLE DETAILS</p><h2>Edit your <em>link.</em></h2><form id="edit-form" class="auth-form"><label for="edit-title">Link title</label><input id="edit-title" name="title" maxlength="80" required><p id="edit-destination" class="edit-destination"></p><label class="checkbox-label"><input id="edit-visible" type="checkbox">Show on my public profile</label><p id="edit-error" class="form-error" role="alert" hidden></p><button class="button button-dark" type="submit">Save changes ↗</button></form><button id="delete-link" class="delete-link text-button">Remove from my space</button></dialog>
 
+  <!-- Shared feedback · Step 1: Announce completed actions without interrupting the page. -->
   <div id="toast" class="toast" role="status" hidden></div>
 </body>
 </html>

@@ -14,6 +14,7 @@ import { djb2, toBase62 } from '../shortener.js';
 const secret = 'integration-test-secret-at-least-thirty-two-characters';
 const config = { secret, publicUrl: 'http://localhost:3000', production: false };
 let database, connection, models, app, dataDirectory;
+// API verification · Step 1: Start an isolated database and initialize the app.
 before(async () => {
   dataDirectory = await mkdtemp(path.join(os.tmpdir(), 'littlelink-test-'));
   database = await MongoMemoryServer.create({ instance: { dbPath: dataDirectory, storageEngine: 'wiredTiger' } });
@@ -22,12 +23,15 @@ before(async () => {
   await Promise.all(Object.values(models).map(model => model.init()));
   app = createApp({ models, config });
 });
+// API verification · Step 2: Stop services and remove only the temporary test data.
 after(async () => { await connection?.close(); await database?.stop(); if (dataDirectory) await rm(dataDirectory, { recursive: true, force: true }); });
+// API verification · Step 3: Create test accounts with cookie-preserving request agents.
 const register = async (username, agent = request.agent(app)) => {
   const response = await agent.post('/api/auth/register').send({ username, email: `${username}@example.com`, password: 'very-good-password' }).expect(201);
   return { agent, response };
 };
 
+// API verification · Step 4: Check shortening preserves the original DJB2 → Base62 mapping and redirects.
 test('shortening preserves the original DJB2 → Base62 mapping and redirects', async () => {
   const longUrl = 'https://example.com';
   const response = await request(app).post('/shorten').send({ longUrl }).expect(201);
@@ -41,6 +45,7 @@ test('shortening preserves the original DJB2 → Base62 mapping and redirects', 
   assert.equal(repeat.body.shortId, response.body.shortId);
 });
 
+// API verification · Step 5: Check bare domains work and unsafe URLs are rejected.
 test('bare domains work and unsafe URLs are rejected', async () => {
   const response = await request(app).post('/shorten').send({ longUrl: 'example.org/path?q=1' }).expect(201);
   assert.equal(response.body.longUrl, 'https://example.org/path?q=1');
@@ -52,6 +57,7 @@ test('bare domains work and unsafe URLs are rejected', async () => {
   await request(app).get('/nosuch').expect(404);
 });
 
+// API verification · Step 6: Check actual DJB2 collisions never replace another destination.
 test('actual DJB2 collisions never replace another destination', async () => {
   const first = 'https://collision.example/Aa', second = 'https://collision.example/B@';
   assert.equal(djb2(first), djb2(second));
@@ -64,12 +70,14 @@ test('actual DJB2 collisions never replace another destination', async () => {
   assert.equal((await request(app).get(`/${b.body.shortId}`).expect(302)).headers.location, second);
 });
 
+// API verification · Step 7: Check concurrent shortening creates one stable stored link.
 test('concurrent shortening creates one stable stored link', async () => {
   const responses = await Promise.all(Array.from({ length: 8 }, () => request(app).post('/shorten').send({ longUrl: 'https://concurrent.example/path' }).expect(201)));
   assert.equal(new Set(responses.map(response => response.body.shortId)).size, 1);
   assert.equal(await models.Link.countDocuments({ longUrl: 'https://concurrent.example/path' }), 1);
 });
 
+// API verification · Step 8: Check jWT signup, password hashing, login, session, and logout.
 test('JWT signup, password hashing, login, session, and logout', async () => {
   const { agent, response } = await register('session_user');
   assert.ok(response.headers['set-cookie'][0].includes('HttpOnly'));
@@ -92,6 +100,7 @@ test('JWT signup, password hashing, login, session, and logout', async () => {
   await request(app).post('/shorten').set('Authorization', 'Bearer invalid').send({ longUrl: 'https://example.com' }).expect(401);
 });
 
+// API verification · Step 9: Check signup validates inputs and rejects duplicate accounts.
 test('signup validates inputs and rejects duplicate accounts', async () => {
   for (const fields of [{ username: 'x' }, { username: '<script>' }, { email: 'bad' }, { password: 'short' }, { password: '😀'.repeat(30) }]) {
     await request(app).post('/api/auth/register').send({ username: 'validation_user', email: 'validation@example.com', password: 'very-good-password', ...fields }).expect(400);
@@ -99,6 +108,7 @@ test('signup validates inputs and rejects duplicate accounts', async () => {
   await request(app).post('/api/auth/register').send({ username: 'session_user', email: 'different@example.com', password: 'very-good-password' }).expect(409);
 });
 
+// API verification · Step 10: Check saved links support titles, visibility, ordering, removal, and independent ownership.
 test('saved links support titles, visibility, ordering, removal, and independent ownership', async () => {
   const { agent: alice } = await register('alice');
   const { agent: bob } = await register('bob');
@@ -125,6 +135,7 @@ test('saved links support titles, visibility, ordering, removal, and independent
   await request(app).get(`/${first.shortId}`).expect(302);
 });
 
+// API verification · Step 11: Check profile details and theme persist; private fields cannot be overwritten.
 test('profile details and theme persist; private fields cannot be overwritten', async () => {
   const { agent } = await register('profile_user');
   await agent.patch('/api/profile').send({ name: 'My little corner', bio: 'All my favorites.', theme: 'dusk', email: 'hijacked@example.com', passwordHash: 'unsafe' }).expect(200);
@@ -138,6 +149,7 @@ test('profile details and theme persist; private fields cannot be overwritten', 
   await request(app).get('/api/profiles/nonexistent').expect(404);
 });
 
+// API verification · Step 12: Check cross-origin mutations are blocked and private source files are never served.
 test('cross-origin mutations are blocked and private source files are never served', async () => {
   await request(app).post('/shorten').set('Origin', 'https://other.example').send({ longUrl: 'https://example.com' }).expect(403);
   await request(app).post('/shorten').set('Origin', 'http://localhost:3000').send({ longUrl: 'https://same-origin.example' }).expect(201);
@@ -149,6 +161,7 @@ test('cross-origin mutations are blocked and private source files are never serv
   await request(app).get('/u/alice').expect(200);
 });
 
+// API verification · Step 13: Check links and accounts survive a full MongoDB stop and restart.
 test('links and accounts survive a full MongoDB stop and restart', async () => {
   const previousLink = await models.Link.findOne({ longUrl: 'https://example.com' });
   const uri = database.getUri();

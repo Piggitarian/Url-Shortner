@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// Browser verification · Step 1: Check single-input homepage, real shortening, copying, themes, and motion.
 test('single-input homepage, real shortening, copying, themes, and motion', async ({ page, context }) => {
   const errors = []; page.on('pageerror', err => errors.push(err.message));
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
@@ -22,6 +23,7 @@ test('single-input homepage, real shortening, copying, themes, and motion', asyn
   expect(errors).toEqual([]);
 });
 
+// Browser verification · Step 2: Check signup, saved links, title editing, visibility, reordering, profile theme, logout, and login.
 test('signup, saved links, title editing, visibility, reordering, profile theme, logout, and login', async ({ page }) => {
   const username = `browser_${Date.now().toString(36)}`;
   const errors = []; page.on('pageerror', err => errors.push(err.message));
@@ -53,6 +55,7 @@ test('signup, saved links, title editing, visibility, reordering, profile theme,
   expect(errors).toEqual([]);
 });
 
+// Browser verification · Step 3: Check mobile layout and error states remain usable.
 test('mobile layout and error states remain usable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 }); await page.goto('/');
   await expect(page.getByRole('button', { name: 'Shorten link' })).toBeVisible();

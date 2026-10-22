@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
+// Browser verification · Step 1: Use one worker and retain traces only when a flow fails.
 export default defineConfig({
   testDir: './test/browser',
   timeout: 30000,
