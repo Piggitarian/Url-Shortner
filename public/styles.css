@@ -73,8 +73,6 @@ body[data-theme=dusk] .account-dialog{background:#211e30f5}body[data-theme=ocean
 /* Account page · Step 6: Center account and close icons inside equal, padding-free hit areas. */
 .account-icon{padding:0;display:flex;align-items:center;justify-content:center;line-height:1}.account-icon svg{display:block;flex-shrink:0;width:18px;height:18px}
 .account-dialog .dialog-close{padding:0;display:flex;align-items:center;justify-content:center;line-height:1}.account-dialog .dialog-close svg{display:block;flex-shrink:0;width:16px;height:16px}
-/* Shared controls · Step 7: Give magnetic action links a transformable box and subtle hover feedback. */
-a[href]{display:inline-block}.wordmark,.account-icon,.button,.public-link,.profile-brand{display:flex}.profile-brand{justify-content:center}
-button.is-magnetic-active,a.is-magnetic-active{filter:brightness(1.1)}.dialog-close,.password-toggle,.text-button,.motion-toggle{transition:background .25s,color .25s,filter .25s}
-/* Shared controls · Step 8: Respect reduced motion and keep native keyboard focus visible. */
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Shared controls · Step 7: Keep action link layout and give selected buttons subtle magnetic feedback. */
+.wordmark,.account-icon,.button,.public-link,.profile-brand{display:flex}.profile-brand{justify-content:center}
+button[data-magnetic].is-magnetic-active{filter:brightness(1.1)}.dialog-close,.password-toggle,.text-button,.motion-toggle{transition:background .25s,color .25s,filter .25s}

@@ -32,7 +32,7 @@
         <label class="sr-only" for="long-url">Website address to shorten</label>
         <svg class="input-link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 14 4-4m-5 7-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m0 8a4 4 0 0 0 6 0l4-4a4 4 0 0 0-6-6l-1 1"/></svg>
         <input id="long-url" name="longUrl" type="text" inputmode="url" placeholder="Paste a link" maxlength="4096" autocomplete="url" required>
-        <button class="button button-dark shorten-submit" type="submit" aria-label="Shorten link" title="Shorten link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
+        <button class="button button-dark shorten-submit" type="submit" data-magnetic aria-label="Shorten link" title="Shorten link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button>
       </form>
       <!-- Home page · Step 2: Show validation errors and the resulting short link. -->
       <p id="shorten-error" class="form-error" role="alert" hidden></p>
@@ -51,7 +51,7 @@
       <!-- Dashboard page · Step 2: Add links and render the editable saved collection. -->
       <section class="panel links-panel" aria-labelledby="links-heading">
         <div class="panel-heading"><h2 id="links-heading">Your links <span id="link-count" class="count">0</span></h2><span class="small-label" id="click-count">0 total clicks</span></div>
-        <form id="add-link-form" class="add-link-form"><label for="add-url">Add a little link</label><div class="inline-input"><input id="add-url" name="longUrl" placeholder="Paste a website address…" inputmode="url" maxlength="4096" required><button class="button button-dark" type="submit">Add ↗</button></div></form>
+        <form id="add-link-form" class="add-link-form"><label for="add-url">Add a little link</label><div class="inline-input"><input id="add-url" name="longUrl" placeholder="Paste a website address…" inputmode="url" maxlength="4096" required><button class="button button-dark" type="submit" data-magnetic>Add ↗</button></div></form>
         <p id="links-error" class="form-error" role="alert" hidden></p>
         <div id="saved-links" class="saved-links"></div>
         <div id="empty-links" class="empty-links"><span aria-hidden="true">↗</span><h3>A little blank canvas.</h3><p>Add your first link above.<br>Your favorites will feel right at home.</p></div>
@@ -66,7 +66,7 @@
           <label for="profile-bio">A little about you <span class="optional">optional</span></label><textarea id="profile-bio" name="bio" maxlength="180" rows="3" placeholder="What’s your little corner all about?"></textarea>
           <label>Set the scene</label><div class="profile-themes" role="group" aria-label="Profile theme"><button type="button" data-profile-theme="meadow"><span class="theme-preview preview-meadow"></span>Meadow</button><button type="button" data-profile-theme="dusk"><span class="theme-preview preview-dusk"></span>Dusk</button><button type="button" data-profile-theme="ocean"><span class="theme-preview preview-ocean"></span>Ocean</button><button type="button" data-profile-theme="forest"><span class="theme-preview preview-forest"></span>Forest</button><button type="button" data-profile-theme="ember"><span class="theme-preview preview-ember"></span>Ember</button></div>
           <p id="profile-error" class="form-error" role="alert" hidden></p>
-          <button class="button button-dark save-profile" type="submit">Save your space <span aria-hidden="true">↗</span></button>
+          <button class="button button-dark save-profile" type="submit" data-magnetic>Save your space <span aria-hidden="true">↗</span></button>
           <button id="copy-profile" class="text-button" type="button">Copy your profile link ⧉</button>
         </form>
       </aside>
@@ -105,7 +105,7 @@
         <span id="password-hint" class="field-hint" hidden>At least 10 characters. Make it something only you know.</span>
         <!-- Account page · Step 5: Show errors inline and submit the selected account action. -->
         <p id="auth-error" class="form-error" role="alert" hidden></p>
-        <button id="auth-submit" class="button button-dark auth-submit" type="submit"><span id="auth-submit-label">Log in</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+        <button id="auth-submit" class="button button-dark auth-submit" type="submit" data-magnetic><span id="auth-submit-label">Log in</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
       </form>
       <p class="auth-switch"><span id="auth-switch-label">New around here?</span> <button id="auth-switch" class="text-button" type="button">Create your little space</button></p>
       <p class="auth-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></svg> A private place for your next good thing.</p>
@@ -113,7 +113,7 @@
   </dialog>
 
   <!-- Dashboard page · Step 4: Edit a link title, visibility, or removal inside a dialog. -->
-  <dialog id="edit-dialog" class="auth-dialog edit-dialog"><button class="dialog-close" data-close="edit-dialog" aria-label="Close">×</button><p class="eyebrow">THE LITTLE DETAILS</p><h2>Edit your <em>link.</em></h2><form id="edit-form" class="auth-form"><label for="edit-title">Link title</label><input id="edit-title" name="title" maxlength="80" required><p id="edit-destination" class="edit-destination"></p><label class="checkbox-label"><input id="edit-visible" type="checkbox">Show on my public profile</label><p id="edit-error" class="form-error" role="alert" hidden></p><button class="button button-dark" type="submit">Save changes ↗</button></form><button id="delete-link" class="delete-link text-button">Remove from my space</button></dialog>
+  <dialog id="edit-dialog" class="auth-dialog edit-dialog"><button class="dialog-close" data-close="edit-dialog" aria-label="Close">×</button><p class="eyebrow">THE LITTLE DETAILS</p><h2>Edit your <em>link.</em></h2><form id="edit-form" class="auth-form"><label for="edit-title">Link title</label><input id="edit-title" name="title" maxlength="80" required><p id="edit-destination" class="edit-destination"></p><label class="checkbox-label"><input id="edit-visible" type="checkbox">Show on my public profile</label><p id="edit-error" class="form-error" role="alert" hidden></p><button class="button button-dark" type="submit" data-magnetic>Save changes ↗</button></form><button id="delete-link" class="delete-link text-button">Remove from my space</button></dialog>
 
   <!-- Shared feedback · Step 1: Announce completed actions without interrupting the page. -->
   <div id="toast" class="toast" role="status" hidden></div>

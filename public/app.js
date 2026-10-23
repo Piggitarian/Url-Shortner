@@ -5,7 +5,6 @@ const state = { user: null, links: [], theme: 'meadow', profileTheme: 'meadow', 
 let toastTimeout;
 let sceneIndex = 0, themeRequest = 0;
 const themes = ['meadow', 'dusk', 'ocean', 'forest', 'ember'];
-const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Shared setup · Step 2: Read preferences without failing when browser storage is unavailable.
 function storageGet(key) { try { return localStorage.getItem(key); } catch { return null; } }
@@ -61,7 +60,7 @@ $$('[data-theme-choice]').forEach(button => button.setAttribute('aria-pressed', 
     requestAnimationFrame(() => requestAnimationFrame(() => { next.classList.add('is-visible'); current.classList.remove('is-visible'); sceneIndex = 1 - sceneIndex; }));
   };
   preload.src = `/assets/${theme}${document.body.classList.contains('motion-paused') ? '-still' : ''}.gif`;
-  if (previous !== theme && !reducedMotion()) {
+  if (previous !== theme) {
     $('.heading-word').animate([{ opacity: .45, filter: 'blur(3px)' }, { opacity: 1, filter: 'blur(0)' }], { duration: 600, easing: 'cubic-bezier(.16,1,.3,1)' });
   }
 }
@@ -83,9 +82,9 @@ setTheme(storageGet('littlelink_theme') || 'meadow');
 setMotion(storageGet('littlelink_motion_v2') === 'paused');
 $('#motion-toggle').addEventListener('click', () => storageSet('littlelink_motion_v2', document.body.classList.contains('motion-paused') ? 'paused' : 'playing'));
 
-// Shared controls · Step 1: Track spring positions for every button and action link.
+// Shared controls · Step 1: Track spring positions only for selected primary action buttons.
 const magneticStates = new Map();
-const magneticSelector = 'button:not(:disabled), a[href], [role="button"]';
+const magneticSelector = 'button[data-magnetic]:not(:disabled)';
 const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
 let magneticFrame = 0;
 let activeMagnet;
@@ -121,19 +120,19 @@ function restingBounds(button) {
   return { left: bounds.left - (spring?.x || 0), top: bounds.top - (spring?.y || 0), width: bounds.width, height: bounds.height };
 }
 
-// Shared controls · Step 5: Release attraction when the cursor leaves, focus changes, or motion is reduced.
+// Shared controls · Step 5: Release attraction when the cursor leaves or focus changes.
 function resetMagnets() {
   activeMagnet = null;
   for (const button of magneticStates.keys()) { button.classList.remove('is-magnetic-active'); moveMagnet(button, 0, 0); }
 }
 
-// Shared controls · Step 6: Attract the closest control, including buttons created after login.
+// Shared controls · Step 6: Attract the closest selected action without pulling near other controls.
 document.addEventListener('pointermove', event => {
-  if (event.pointerType !== 'mouse' || !finePointer.matches || reducedMotion()) return;
+  if (event.pointerType !== 'mouse' || !finePointer.matches) return;
   const root = document.querySelector('dialog[open]') || document;
   let button = event.target.closest(magneticSelector);
   if (button && !root.contains(button)) button = null;
-  if (!button && !event.target.closest('input, textarea, select, label')) {
+  if (!button && !event.target.closest('button, a[href], [role="button"], input, textarea, select, label')) {
     let nearest = 38;
     for (const candidate of root.querySelectorAll(magneticSelector)) {
       if (!candidate.getClientRects().length) continue;
@@ -159,11 +158,6 @@ document.addEventListener('focusin', resetMagnets);
 document.addEventListener('scroll', resetMagnets, true);
 window.addEventListener('blur', resetMagnets);
 finePointer.addEventListener('change', resetMagnets);
-matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => {
-  resetMagnets(); cancelAnimationFrame(magneticFrame); magneticFrame = 0;
-  for (const button of magneticStates.keys()) button.style.translate = '';
-  magneticStates.clear();
-});
 
 // Navigation · Step 1: Show account access or the signed-in profile and logout controls.
 function renderNavigation() {
@@ -204,7 +198,7 @@ function openAuth(mode) {
   $('#auth-switch').textContent = register ? 'Log in' : 'Create your little space'; showError('#auth-error', '');
   resetMagnets();
   if (!$('#auth-dialog').open) { $('#auth-dialog').classList.remove('is-closing'); $('#auth-dialog').showModal(); }
-  if (switching && !reducedMotion()) {
+  if (switching) {
     const direction = register ? 1 : -1;
     ['#auth-heading', '#auth-description', '#auth-form', '.auth-switch'].forEach((selector, index) => {
       const element = $(selector);
@@ -232,7 +226,6 @@ $('#toggle-password').addEventListener('click', () => setPasswordVisibility($('#
 function closeDialog(dialog) {
   if (!dialog.open || dialog.classList.contains('is-closing')) return;
   resetMagnets();
-  if (reducedMotion()) { dialog.close(); return; }
   dialog.classList.add('is-closing');
   setTimeout(() => { dialog.close(); dialog.classList.remove('is-closing'); }, 180);
 }
@@ -268,7 +261,7 @@ $('#shorten-form').addEventListener('submit', async event => {
   try {
     const result = await send('/shorten', 'POST', { longUrl: $('#long-url').value }); state.result = result;
     $('#result-url').textContent = result.shortUrl.replace(/^https?:\/\//, ''); $('#result-url').href = result.shortUrl; $('#shorten-result').hidden = false;
-    if (!reducedMotion()) $('#shorten-result').animate([{ opacity: 0, transform: 'translateY(12px) scale(.97)', filter: 'blur(5px)' }, { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0)' }], { duration: 650, easing: 'cubic-bezier(.16,1,.3,1)' });
+    $('#shorten-result').animate([{ opacity: 0, transform: 'translateY(12px) scale(.97)', filter: 'blur(5px)' }, { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0)' }], { duration: 650, easing: 'cubic-bezier(.16,1,.3,1)' });
     $('#save-message').replaceChildren();
     if (result.saved) $('#save-message').textContent = 'Saved to your little space. Ready to share.';
     else {
